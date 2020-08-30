@@ -1,12 +1,17 @@
 import * as Honeycomb from "honeycomb-grid";
 
-export const drawHexTexture = (ctx) => {
+const hexWidth = 12 + 1;
+const hexHeight = 9 + 1;
+
+// https://hexagoncalculator.apphb.com/
+
+export const drawHexTexture = (ctx, width) => {
   const Hex = Honeycomb.extendHex({
-    size: 100, // default: 1
+    size: 50, // default: 1
     orientation: "flat", // default: 'pointy'
   });
   const Grid = Honeycomb.defineGrid(Hex);
-  let grid = Grid.rectangle({ width: 12, height: 9 });
+  let grid = Grid.rectangle({ width: hexWidth, height: hexHeight });
 
   grid.forEach((hex) => {
     const point = hex.toPoint();
@@ -28,4 +33,14 @@ export const drawHexTexture = (ctx) => {
     ctx.lineWidth = 1;
     ctx.stroke();
   });
+};
+
+export const hexTextureAsUri = (width) => {
+  let canvas = document.getElementById("hiddenCanvas");
+  canvas.width = width;
+  canvas.height = width;
+  let ctx = canvas.getContext("2d");
+  drawHexTexture(ctx, width);
+  let dataURL = canvas.toDataURL("image/png");
+  return dataURL;
 };

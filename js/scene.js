@@ -1,7 +1,7 @@
 import * as BABYLON from "babylonjs";
 import * as _ from "lodash";
 
-import { drawHexTexture } from "./hex.js";
+import { hexTextureAsUri } from "./hex.js";
 
 export const createScene = function (engine, canvas) {
   var scene = new BABYLON.Scene(engine);
@@ -16,7 +16,7 @@ export const createScene = function (engine, canvas) {
     new BABYLON.Vector3(0, 0, -0),
     scene
   );
-  camera.setPosition(new BABYLON.Vector3(0, 0, -200));
+  camera.setPosition(new BABYLON.Vector3(0, 0, -6));
   camera.attachControl(canvas, true);
 
   var light = new BABYLON.HemisphericLight(
@@ -31,25 +31,20 @@ export const createScene = function (engine, canvas) {
 
   var mat = new BABYLON.StandardMaterial("mat", scene);
 
-  let width = 1000;
-  var myDynamicTexture = new BABYLON.DynamicTexture("texture", width, scene);
+  let url = hexTextureAsUri(600);
 
-  let ctx = myDynamicTexture.getContext();
-
-  drawHexTexture(ctx);
-  myDynamicTexture.update(false);
-
-  mat.diffuseTexture = myDynamicTexture;
+  mat.diffuseTexture = new BABYLON.Texture(url, scene);
 
   var faceUV = new Array(20);
 
   for (var i = 0; i < 20; i++) {
+    //faceUV[i] = new BABYLON.Vector4(0.1, 0.3, 1, 0.6);
     faceUV[i] = new BABYLON.Vector4(0, 0, 1, 1);
   }
 
-  var icosahedron = BABYLON.MeshBuilder.CreatePolyhedron(
+  let icosahedron = BABYLON.MeshBuilder.CreatePolyhedron(
     "ico",
-    { type: 3, size: 20, faceUV },
+    { type: 3, size: 1, faceUV },
     scene
   );
   icosahedron.material = mat;
