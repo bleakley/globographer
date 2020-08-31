@@ -16,7 +16,7 @@ export const createScene = function (engine, canvas) {
     new BABYLON.Vector3(0, 0, -0),
     scene
   );
-  camera.setPosition(new BABYLON.Vector3(0, 0, -6));
+  camera.setPosition(new BABYLON.Vector3(0, 0, -3));
   camera.attachControl(canvas, true);
 
   var light = new BABYLON.HemisphericLight(
@@ -37,9 +37,28 @@ export const createScene = function (engine, canvas) {
 
   var faceUV = new Array(20);
 
+  let uBottomLeft = 4 / 20; //(0.2 * 1) / 20;
+  let uTopRight = 16 / 20; //(0.2 * 19) / 20; //19 / 20;
+  let vBottomLeft = 2 / 20; //(0.5 * 1) / 20; //1 / 20;
+  let vTopRight = 18 / 20; //(0.5 * 19) / 20; //leave this 11/20
+  let full = new BABYLON.Vector4(0, 0, 1, 1);
+  let cropped = new BABYLON.Vector4(
+    uBottomLeft,
+    vBottomLeft,
+    uTopRight,
+    vTopRight
+  );
+  let croppedFlipped = (faceUV[i] = new BABYLON.Vector4(
+    uBottomLeft,
+    vTopRight,
+    uTopRight,
+    vBottomLeft
+  ));
+
   for (var i = 0; i < 20; i++) {
-    //faceUV[i] = new BABYLON.Vector4(0.1, 0.3, 1, 0.6);
-    faceUV[i] = new BABYLON.Vector4(0, 0, 1, 1);
+    //faceUV[i] = new BABYLON.Vector4(0, 0, 1, 1);
+    faceUV[i] = full;
+    //faceUV[i] = new BABYLON.Vector4(1 / 20, 1 / 20, 19 / 20, 19 / 20);
   }
 
   let icosahedron = BABYLON.MeshBuilder.CreatePolyhedron(
