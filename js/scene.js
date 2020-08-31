@@ -31,16 +31,17 @@ export const createScene = function (engine, canvas) {
 
   var mat = new BABYLON.StandardMaterial("mat", scene);
 
-  let url = hexTextureAsUri(600);
+  let { data, dataURL } = hexTextureAsUri(600);
+  console.log(data);
 
-  mat.diffuseTexture = new BABYLON.Texture(url, scene);
+  mat.diffuseTexture = new BABYLON.Texture(dataURL, scene);
 
   var faceUV = new Array(20);
 
-  let uBottomLeft = 4 / 20; //(0.2 * 1) / 20;
-  let uTopRight = 16 / 20; //(0.2 * 19) / 20; //19 / 20;
-  let vBottomLeft = 2 / 20; //(0.5 * 1) / 20; //1 / 20;
-  let vTopRight = 18 / 20; //(0.5 * 19) / 20; //leave this 11/20
+  let uBottomLeft = 0.048;
+  let uTopRight = 0.152;
+  let vBottomLeft = 0.437;
+  let vTopRight = 0.6544627746345163;
   let full = new BABYLON.Vector4(0, 0, 1, 1);
   let cropped = new BABYLON.Vector4(
     uBottomLeft,
@@ -48,17 +49,15 @@ export const createScene = function (engine, canvas) {
     uTopRight,
     vTopRight
   );
-  let croppedFlipped = (faceUV[i] = new BABYLON.Vector4(
+  let croppedFlipped = new BABYLON.Vector4(
     uBottomLeft,
     vTopRight,
     uTopRight,
     vBottomLeft
-  ));
+  );
 
   for (var i = 0; i < 20; i++) {
-    //faceUV[i] = new BABYLON.Vector4(0, 0, 1, 1);
-    faceUV[i] = full;
-    //faceUV[i] = new BABYLON.Vector4(1 / 20, 1 / 20, 19 / 20, 19 / 20);
+    faceUV[i] = croppedFlipped;
   }
 
   let icosahedron = BABYLON.MeshBuilder.CreatePolyhedron(
