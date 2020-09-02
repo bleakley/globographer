@@ -1,6 +1,6 @@
 const fs = require("fs");
 const zlib = require("zlib");
-var parseStringPromise = require("xml2js").parseStringPromise;
+var { parseStringPromise } = require("xml2js");
 const { promisify } = require("util");
 const gunzip = promisify(zlib.gunzip);
 

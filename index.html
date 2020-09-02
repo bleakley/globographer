@@ -18,11 +18,20 @@
         height: 100%;
         touch-action: none;
       }
+      #fileInput {
+        height: 100px;
+        width: 100px;
+        position: fixed;
+        left: 50px;
+        top: 50px;
+        z-index: 100;
+      }
     </style>
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
     <canvas id="hiddenCanvas"></canvas>
     <script src="bundle.js"></script>
+    <input id="fileInput" type="file" />
   </body>
 </html>
