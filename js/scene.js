@@ -1,7 +1,9 @@
 import * as BABYLON from "babylonjs";
 import * as _ from "lodash";
 
-import { hexTextureAsUri } from "./hex.js";
+import { hexTextureAsUri, getIcosahedronUVs } from "./hex.js";
+
+//https://www.babylonjs-playground.com/#VKBJN#14
 
 export const createScene = function (engine, canvas) {
   var scene = new BABYLON.Scene(engine);
@@ -31,41 +33,22 @@ export const createScene = function (engine, canvas) {
 
   var mat = new BABYLON.StandardMaterial("mat", scene);
 
-  let { data, dataURL } = hexTextureAsUri(600);
-  console.log(data);
+  let dataURL = hexTextureAsUri(600);
 
   mat.diffuseTexture = new BABYLON.Texture(dataURL, scene);
 
-  var faceUV = new Array(20);
-
-  let uBottomLeft = 0.048;
-  let uTopRight = 0.152;
-  let vBottomLeft = 0.437;
-  let vTopRight = 0.6544627746345163;
-  let full = new BABYLON.Vector4(0, 0, 1, 1);
-  let cropped = new BABYLON.Vector4(
-    uBottomLeft,
-    vBottomLeft,
-    uTopRight,
-    vTopRight
-  );
-  let croppedFlipped = new BABYLON.Vector4(
-    uBottomLeft,
-    vTopRight,
-    uTopRight,
-    vBottomLeft
-  );
-
-  for (var i = 0; i < 20; i++) {
-    faceUV[i] = croppedFlipped;
-  }
-
   let icosahedron = BABYLON.MeshBuilder.CreatePolyhedron(
     "ico",
-    { type: 3, size: 1, faceUV },
+    { type: 3, size: 1, updatable: true },
     scene
   );
   icosahedron.material = mat;
+
+  var uvs = getIcosahedronUVs();
+
+  icosahedron.updateVerticesData(BABYLON.VertexBuffer.UVKind, uvs);
+
+  new BABYLON.AxesViewer(scene);
 
   scene.registerBeforeRender(function () {
     pl.position = camera.position;
