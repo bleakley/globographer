@@ -18,13 +18,19 @@
         height: 100%;
         touch-action: none;
       }
-      #fileInput {
+      #controlPanel {
         height: 100px;
-        width: 100px;
+        width: 200px;
         position: fixed;
-        left: 50px;
-        top: 50px;
+        left: 10px;
+        top: 10px;
         z-index: 100;
+        background-color: blanchedalmond;
+        padding: 5px;
+        border: thick double brown;
+      }
+      #projectionSelect {
+        padding-bottom: 5px;
       }
     </style>
   </head>
@@ -32,6 +38,41 @@
     <canvas id="renderCanvas"></canvas>
     <canvas id="hiddenCanvas"></canvas>
     <script src="bundle.js"></script>
-    <input id="fileInput" type="file" />
+    <div id="controlPanel">
+      <div id="projectionSelect">
+        <div>
+          <input
+            type="radio"
+            id="flat"
+            name="projection"
+            value="flat"
+            checked
+          />
+          <label for="flat">Flat</label>
+        </div>
+
+        <div>
+          <input
+            type="radio"
+            id="icosahedron"
+            name="projection"
+            value="icosahedron"
+          />
+          <label for="icosahedron">Icosahedron</label>
+        </div>
+
+        <div>
+          <input
+            type="radio"
+            id="sphere"
+            name="projection"
+            value="sphere"
+            disabled="true"
+          />
+          <label for="sphere">Icosphere</label>
+        </div>
+      </div>
+      <input id="fileInput" type="file" />
+    </div>
   </body>
 </html>
