@@ -22,14 +22,17 @@ export const fileToData = async (wxx) => {
   let raw = await readUploadedFileAsBinary(wxx);
   let decoded = raw.swap16().toString("utf16le");
   let parsed = await parseStringPromise(decoded);
-  //console.log(parsed);
   return parsed.map;
 };
 
 let canBeRendered = (map) => {
   let meta = map["$"];
-  console.log(meta);
-  return meta.type === "WORLD" && meta.projection === "ICOSAHEDRAL";
+  return (
+    meta.type === "WORLD" &&
+    meta.mapProjection === "ICOSAHEDRAL" &&
+    meta.hexOrientation === "COLUMNS" &&
+    meta.triangleSize % 4 === 0
+  );
 };
 
 let parseHex = (hex) => {
@@ -47,5 +50,11 @@ let parseTileRow = (tileRow) => {
 };
 
 export const parseWxxData = (data) => {
-  return data.tiles[0].tilerow.map(parseTileRow);
+  return {
+    canBeRendered: canBeRendered(data),
+    triangleSize: Number(data["$"].triangleSize),
+    tilesWide: Number(data.tiles[0]["$"].tilesWide),
+    tilesHigh: Number(data.tiles[0]["$"].tilesHigh),
+    tiles: data.tiles[0].tilerow.map(parseTileRow),
+  };
 };

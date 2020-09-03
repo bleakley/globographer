@@ -1,12 +1,16 @@
 import * as BABYLON from "babylonjs";
 import { createScene } from "./scene.js";
-import { drawHexTexture } from "./hex.js";
+import { hexResolution, drawHexTexture, rootThreeOverTwo } from "./hex.js";
 import { fileToData, parseWxxData } from "./load.js";
+
+// 24 : 133 x 55
+// 12 : 67 x 28
 
 let mapData = null;
 let projection = null;
+let features = {};
 
-var canvas, input, projections;
+var canvas, input, projections, featureChecks;
 
 let getProjection = () => {
   for (var i = 0, length = projections.length; i < length; i++) {
@@ -26,7 +30,7 @@ let resetCanvas = () => {
 let renderIcosahedron = (mapData) => {
   resetCanvas();
   var engine = new BABYLON.Engine(canvas, true);
-  var scene = createScene(engine, canvas, mapData);
+  var scene = createScene(engine, canvas, mapData, features);
 
   engine.runRenderLoop(function () {
     scene.render();
@@ -40,9 +44,10 @@ let renderIcosahedron = (mapData) => {
 let renderFlat = (mapData) => {
   resetCanvas();
   let ctx = canvas.getContext("2d");
-  canvas.width = 50 * 100;
-  canvas.height = 0.866025 * 50 * 55;
-  drawHexTexture(ctx, canvas.width, canvas.height, mapData);
+  canvas.width = hexResolution * 2 * mapData.tilesWide;
+  canvas.height =
+    rootThreeOverTwo * hexResolution * (2 * mapData.tilesHigh + 1);
+  drawHexTexture(ctx, canvas.width, canvas.height, mapData, features);
   return;
 };
 
@@ -65,6 +70,7 @@ window.addEventListener("DOMContentLoaded", function () {
   canvas = document.getElementById("renderCanvas");
   input = document.getElementById("fileInput");
   projections = document.getElementsByName("projection");
+  featureChecks = document.getElementsByName("feature");
 
   projection = getProjection();
 
@@ -72,6 +78,7 @@ window.addEventListener("DOMContentLoaded", function () {
     let file = e.target.files[0];
     let data = await fileToData(file);
     mapData = parseWxxData(data);
+    console.log(mapData);
     render(mapData);
   };
 
@@ -79,6 +86,15 @@ window.addEventListener("DOMContentLoaded", function () {
     (item) =>
       (item.onchange = async (e) => {
         projection = getProjection();
+        render(mapData);
+      })
+  );
+
+  featureChecks.forEach(
+    (item) =>
+      (item.onchange = async (e) => {
+        features[item.id] = item.checked;
+        console.log(features);
         render(mapData);
       })
   );

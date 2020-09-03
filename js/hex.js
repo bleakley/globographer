@@ -1,38 +1,37 @@
 import * as Honeycomb from "honeycomb-grid";
 
-const triangleSize = 12;
-const hexWidth = 5.5 * triangleSize;
-const hexHeight = 3 * (triangleSize * 0.75 + 1);
+export const hexResolution = 50;
+export const rootThreeOverTwo = Math.sqrt(3) / 2;
 
 // https://hexagoncalculator.apphb.com/
 
-const getGlobeTriangles = () => {
+const getGlobeTriangles = (triangleSize) => {
   let arcticTriangles = [];
   for (let i = 0; i < 5; i++) {
-    let a = [6 + 12 * i, 0];
-    let b = [12 + 12 * i, 9];
-    let c = [0 + 12 * i, 9];
+    let a = [triangleSize * (i + 0.5), 0];
+    let b = [triangleSize * (i + 1), triangleSize * 0.75];
+    let c = [triangleSize * i, triangleSize * 0.75];
     arcticTriangles.push([a, b, c]);
   }
   let cancerTriangles = [];
   for (let i = 0; i < 5; i++) {
-    let a = [6 + 12 * i, 18];
-    let b = [12 + 12 * i, 9];
-    let c = [0 + 12 * i, 9];
+    let a = [triangleSize * (i + 0.5), triangleSize * 1.5];
+    let b = [triangleSize * (i + 1), triangleSize * 0.75];
+    let c = [triangleSize * i, triangleSize * 0.75];
     cancerTriangles.push([b, a, c]);
   }
   let capricornTriangles = [];
   for (let i = 0; i < 5; i++) {
-    let a = [12 + 12 * i, 9];
-    let b = [18 + 12 * i, 18];
-    let c = [6 + 12 * i, 18];
+    let a = [triangleSize * (i + 1), triangleSize * 0.75];
+    let b = [triangleSize * (i + 1.5), triangleSize * 1.5];
+    let c = [triangleSize * (i + 0.5), triangleSize * 1.5];
     capricornTriangles.push([a, b, c]);
   }
   let antarcticTriangles = [];
   for (let i = 0; i < 5; i++) {
-    let a = [12 + 12 * i, 27];
-    let b = [18 + 12 * i, 18];
-    let c = [6 + 12 * i, 18];
+    let a = [triangleSize * (i + 1), triangleSize * 2.25];
+    let b = [triangleSize * (i + 1.5), triangleSize * 1.5];
+    let c = [triangleSize * (i + 0.5), triangleSize * 1.5];
     antarcticTriangles.push([b, a, c]);
   }
 
@@ -120,13 +119,16 @@ const getColorForTerrain = (terrainCode, frozen) => {
   }
 };
 
-export const drawHexTexture = (ctx, width, height, mapData) => {
+export const drawHexTexture = (ctx, width, height, mapData, features) => {
   const Hex = Honeycomb.extendHex({
-    size: 50, // default: 1
+    size: hexResolution, // default: 1
     orientation: "flat", // default: 'pointy'
   });
   const Grid = Honeycomb.defineGrid(Hex);
-  let grid = Grid.rectangle({ width: 67, height: 28 });
+  let grid = Grid.rectangle({
+    width: mapData.tilesWide,
+    height: mapData.tilesHigh,
+  });
 
   let xOffset = 0;
   let yOffset = 0;
@@ -134,8 +136,8 @@ export const drawHexTexture = (ctx, width, height, mapData) => {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
 
-  for (let i = 0; i < 67; i++) {
-    for (let j = 0; j < 28; j++) {
+  for (let i = 0; i < mapData.tilesWide; i++) {
+    for (let j = 0; j < mapData.tilesHigh; j++) {
       let hex = grid.get([i, j]);
       const point = hex.toPoint();
       // add the hex's position to each of its corner points
@@ -157,36 +159,38 @@ export const drawHexTexture = (ctx, width, height, mapData) => {
       //ctx.stroke();
 
       ctx.fillStyle = getColorForTerrain(
-        mapData[i][j].terrain,
-        mapData[i][j].frozen
+        mapData.tiles[i][j].terrain,
+        mapData.tiles[i][j].frozen
       );
       ctx.fill();
     }
   }
 
-  let triangles = getGlobeTriangles();
+  let triangles = getGlobeTriangles(mapData.triangleSize);
 
-  /*triangles.forEach((t) => {
-    let a = grid.get(t[0]);
-    let b = grid.get(t[1]);
-    let c = grid.get(t[2]);
+  if (features && features.triangleOutlines) {
+    triangles.forEach((t) => {
+      let a = grid.get(t[0]);
+      let b = grid.get(t[1]);
+      let c = grid.get(t[2]);
 
-    let ax = a.toPoint().add(a.center()).x;
-    let ay = a.toPoint().add(a.center()).y;
-    let bx = b.toPoint().add(b.center()).x;
-    let by = b.toPoint().add(b.center()).y;
-    let cx = c.toPoint().add(c.center()).x;
-    let cy = c.toPoint().add(c.center()).y;
+      let ax = a.toPoint().add(a.center()).x;
+      let ay = a.toPoint().add(a.center()).y;
+      let bx = b.toPoint().add(b.center()).x;
+      let by = b.toPoint().add(b.center()).y;
+      let cx = c.toPoint().add(c.center()).x;
+      let cy = c.toPoint().add(c.center()).y;
 
-    ctx.beginPath();
-    ctx.moveTo(ax, ay);
-    ctx.lineTo(bx, by);
-    ctx.lineTo(cx, cy);
-    ctx.lineTo(ax, ay);
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 5;
-    ctx.stroke();
-  });*/
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
+      ctx.lineTo(cx, cy);
+      ctx.lineTo(ax, ay);
+      ctx.strokeStyle = "green";
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    });
+  }
 
   let drawLetter = (x, y, letter) => {
     let hex = grid.get([x, y]);
@@ -223,10 +227,8 @@ export const drawHexTexture = (ctx, width, height, mapData) => {
 };
 
 let getUVsForTriangle = (grid, a, b, c) => {
-  let textureWidth = 1 * 100;
-  let textureHeight = 0.866025 * 1 * 55;
-  console.log("getting uvs for triangle");
-  console.log({ a, b, c });
+  let textureWidth = 2 * grid.width;
+  let textureHeight = rootThreeOverTwo * (2 * grid.height + 1);
   let ax = grid.get(a).toPoint().add(grid.get(a).center()).x;
   let ay = grid.get(a).toPoint().add(grid.get(a).center()).y;
   let bx = grid.get(b).toPoint().add(grid.get(b).center()).x;
@@ -244,28 +246,27 @@ let getUVsForTriangle = (grid, a, b, c) => {
   return [uvs.x0, uvs.y0, uvs.x1, uvs.y1, uvs.x2, uvs.y2];
 };
 
-export const getIcosahedronUVs = () => {
+export const getIcosahedronUVs = (triangleSize, tilesWide, tilesHigh) => {
   const Hex = Honeycomb.extendHex({
     size: 1, // default: 1
     orientation: "flat", // default: 'pointy'
   });
   const Grid = Honeycomb.defineGrid(Hex);
-  let grid = Grid.rectangle({ width: 67, height: 28 });
+  let grid = Grid.rectangle({ width: tilesWide, height: tilesHigh });
 
-  let icoUVs = getGlobeTriangles()
+  let icoUVs = getGlobeTriangles(triangleSize)
     .map((t) => getUVsForTriangle(grid, t[0], t[1], t[2]))
     .flat();
   return icoUVs;
 };
 
-export const hexTextureAsUri = (width, mapData) => {
+export const hexTextureAsUri = (mapData, features) => {
   let canvas = document.getElementById("hiddenCanvas");
-  canvas.width = 50 * 100;
-  canvas.height = 0.866025 * 50 * 55;
-  //canvas.width = width;
-  //canvas.height = 0.866025 * width;
+  canvas.width = hexResolution * 2 * mapData.tilesWide;
+  canvas.height =
+    rootThreeOverTwo * hexResolution * (2 * mapData.tilesHigh + 1);
   let ctx = canvas.getContext("2d");
-  drawHexTexture(ctx, canvas.width, canvas.height, mapData);
+  drawHexTexture(ctx, canvas.width, canvas.height, mapData, features);
   let dataURL = canvas.toDataURL("image/png");
   return dataURL;
 };

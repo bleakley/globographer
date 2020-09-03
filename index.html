@@ -19,7 +19,6 @@
         touch-action: none;
       }
       #controlPanel {
-        height: 100px;
         width: 200px;
         position: fixed;
         left: 10px;
@@ -29,7 +28,8 @@
         padding: 5px;
         border: thick double brown;
       }
-      #projectionSelect {
+      #projectionSelect,
+      #featureSelect {
         padding-bottom: 5px;
       }
     </style>
@@ -50,7 +50,6 @@
           />
           <label for="flat">Flat</label>
         </div>
-
         <div>
           <input
             type="radio"
@@ -60,18 +59,33 @@
           />
           <label for="icosahedron">Icosahedron</label>
         </div>
-
         <div>
           <input
             type="radio"
             id="sphere"
             name="projection"
             value="sphere"
-            disabled="true"
+            disabled
           />
           <label for="sphere">Icosphere</label>
         </div>
       </div>
+
+      <div id="featureSelect">
+        <div>
+          <input type="checkbox" id="hexOutlines" name="feature" disabled />
+          <label for="hexOutlines">Hex outlines</label>
+        </div>
+        <div>
+          <input type="checkbox" id="triangleOutlines" name="feature" />
+          <label for="triangleOutlines">Triangle outlines</label>
+        </div>
+        <div>
+          <input type="checkbox" id="triangleLabels" name="feature" disabled />
+          <label for="triangleLabels">Triangle labels</label>
+        </div>
+      </div>
+
       <input id="fileInput" type="file" />
     </div>
   </body>

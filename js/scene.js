@@ -5,7 +5,7 @@ import { hexTextureAsUri, getIcosahedronUVs } from "./hex.js";
 
 //https://www.babylonjs-playground.com/#VKBJN#14
 
-export const createScene = function (engine, canvas, mapData) {
+export const createScene = function (engine, canvas, mapData, features) {
   var scene = new BABYLON.Scene(engine);
   scene.clearColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 
@@ -33,7 +33,7 @@ export const createScene = function (engine, canvas, mapData) {
 
   var mat = new BABYLON.StandardMaterial("mat", scene);
 
-  let dataURL = hexTextureAsUri(600, mapData);
+  let dataURL = hexTextureAsUri(mapData, features);
 
   mat.diffuseTexture = new BABYLON.Texture(dataURL, scene);
 
@@ -44,7 +44,11 @@ export const createScene = function (engine, canvas, mapData) {
   );
   icosahedron.material = mat;
 
-  var uvs = getIcosahedronUVs();
+  var uvs = getIcosahedronUVs(
+    mapData.triangleSize,
+    mapData.tilesWide,
+    mapData.tilesHigh
+  );
 
   icosahedron.updateVerticesData(BABYLON.VertexBuffer.UVKind, uvs);
 
